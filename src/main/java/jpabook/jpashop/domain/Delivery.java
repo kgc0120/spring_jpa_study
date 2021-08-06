@@ -13,7 +13,7 @@ public class Delivery {
     @Column(name= "delivery_id")
     private Long id;
 
-    @OneToOne(mappedBy = "delivery") // 거울
+    @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY) // 거울
     private Order order;
 
     @Embedded
