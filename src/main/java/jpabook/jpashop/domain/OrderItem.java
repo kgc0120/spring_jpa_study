@@ -53,6 +53,6 @@ public class OrderItem {
      * @return
      */
     public int getTotalPrice() {
-        return getOrderPrice() + getCount();
+        return getOrderPrice() * getCount();
     }
 }
