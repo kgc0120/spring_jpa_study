@@ -1,6 +1,8 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -8,10 +10,18 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class MemberRepository {
 
-    @PersistenceContext // EntityManager를 주입받는다.
-    private EntityManager em;
+//    @PersistenceContext // EntityManager를 주입받는다.
+//    private EntityManager em;
+
+//    @Autowired // spring data jpa를 사용하면 @PersistenceContext -> @Autowired로 바꿀 수 있다.
+    private final EntityManager em;
+
+//    public MemberRepository(EntityManager em) {
+//        this.em = em;
+//    }
 
     public void save(Member member) {
         em.persist(member);
