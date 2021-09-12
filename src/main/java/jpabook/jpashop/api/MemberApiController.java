@@ -4,12 +4,12 @@ import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -35,6 +35,59 @@ public class MemberApiController {
         Long id = memberService.join(member);
         return new CreatMemberResponse(id);
     }
+
+    @PutMapping("/api/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2(
+            @PathVariable("id")Long id,
+            @RequestBody @Valid UpdateMemberRequest request) {
+
+        // 커맨드랑 쿼리를 분리한다.
+        // update 문에서 member 객체 자체를 반환할수도 있지만 그럴경우 커맨드랑 쿼리랑 같이 있게된다.
+        // 하나의 데이터를 pk 기반으로 조회할 때는 전체적으로 성능에 영향을 주는게 미미하다.
+        // 이럴경우 보다 나은 유지보수성을 위해서 커맨드랑 쿼리를 분리하는 것이 좋다.
+        memberService.update(id, request.getName());
+        Member member = memberService.findOne(id);
+        return new UpdateMemberResponse(id, member.getName());
+    }
+
+    @GetMapping("/api/v2/members")
+    public Result memberV2() {
+        List<Member> members = memberService.findMembers();
+        var collect = members.stream()
+                .map(m -> new MemberDto(m.getName()))
+                .collect(Collectors.toList());
+
+        return new Result(collect.size() ,collect);
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class Result<T>{
+        private int count;
+        private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class MemberDto{
+        String name;
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateMemberResponse {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    static class UpdateMemberRequest {
+        private Long id;
+        private String name;
+    }
+
 
     @Data
     static class CreateMemberRequest {
