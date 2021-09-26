@@ -12,6 +12,7 @@ spring:
       hibernate:
 #        show_sql: true
         format_sql : true
+        default_batch_fetch_size : 100 # in query로 나간다. @BatchSize : 개별 최적화할 때 사용
 
 
 

@@ -78,4 +78,34 @@ public class OrderRepository {
         ).getResultList();
 
     }
+
+    public List<Order> findAllWithItem() {
+
+        return em.createQuery(
+                "select distinct o from Order o" +
+                " join fetch o.member m" +
+                " join fetch o.delivery d" +
+                " join fetch o.orderItems oi" +
+                " join fetch oi.item i", Order.class)
+                .setFirstResult(0)
+                .setMaxResults(100)
+                // 일대다 조건에서는 페이징 처리를 하면 안된다.
+                // 우리는 Order를 기준으로 페이징 처리를 하고 싶은데 일대다가 되면 다쪽 기준으로 데이터를 가져오기 때문에
+                // 페이징 처리가 불가능해진다.
+                // hibernate는 경고를 내고 모든 데이터를 가져와서 메모리에서 sorting 한다.
+                // out of memory가 발생한다. 매우 위험!
+                .getResultList();
+
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        )
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultList();
+    }
 }
